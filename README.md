@@ -13,4 +13,7 @@ Borough/County:  All Boroughs/Counties
 Document Class:  All Document Classes
 ```
 
-Then, it extracts the search results into a CSV file.
+Next, it extracts the search results into a CSV file.
+
+It then merges the CSV with a shapefile of blocks and lots (either [this](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-pluto-mappluto.page) or [this](https://data.cityofnewyork.us/Housing-Development/Department-of-Finance-Digital-Tax-Map/smk3-tmxj)).
+
