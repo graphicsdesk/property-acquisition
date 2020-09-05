@@ -1,6 +1,8 @@
 #!/usr/bin/env python3
 
+from bs4 import BeautifulSoup
 import requests
+import json
 import sys
 
 
@@ -46,9 +48,39 @@ def scrape_acris():
     print(response.text)
 
 
+def parse_results():
+    with open(sys.argv[2]) as f:
+        soup = BeautifulSoup(f.read(), 'lxml')
+
+    headers = None
+
+    output = {
+        'documents': [],
+        'meta': None,
+    }
+
+    for row in soup.form.tbody.table.find_all('tr', recursive=False):
+        values = row.find_all('td', recursive=False)[1:]
+        if headers is None:
+            headers = [v.font.text.strip().replace('  ', '').replace(
+                '/\n', '/').replace('\n', ' ') for v in values]
+            continue
+
+        output['documents'].append(
+            dict(zip(headers, [v.font.text.strip() for v in values])))
+
+    # Store search critera and date in the output as metadata
+    output['meta'] = soup.body.find_all('table', recursive=False)[3].table.font.find_next(
+        'font').text.replace(u'\xa0', u' ').replace('  ', '').replace(':\n', ':').replace('\n\n', '\n').strip()
+
+    print(json.dumps(output, indent=2))
+
+
+
 def main():
     {
         '-scrape-acris': scrape_acris,
+        '-parse-results': parse_results,
     }[sys.argv[1]]()
 
 
