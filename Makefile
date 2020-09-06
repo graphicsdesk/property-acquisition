@@ -1,7 +1,8 @@
 DATA_DIR = data
 PARTY_DIR = party-search
 
-# TODO: merge with tax lot shapefile
+# TODO: merge with tax lot shapefile.
+# Look at https://github.com/GeospatialPython/pyshp#reading-shapefiles
 
 $(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json documents.py
 	./documents.py -parse-results $< > $@
