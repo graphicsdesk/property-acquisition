@@ -3,11 +3,11 @@ PARTY_DIR = party-search
 
 # TODO: merge with tax lot shapefile
 
-$(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json main.py
-	./main.py -parse-results $< > $@
+$(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json documents.py
+	./documents.py -parse-results $< > $@
 
 $(DATA_DIR)/acris-results-html.json: $(PARTY_DIR)/names.json
-	./main.py -scrape-acris $< > $@
+	./documents.py -scrape-acris $< > $@
 
 KEYWORDS = TRUSTEES COLUMBIA
 
