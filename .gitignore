@@ -4,3 +4,8 @@
 party-search/ACRIS*
 party-search/*.doc
 party-search/all_parties.txt
+
+.Rproj.user
+.RData
+.Rhistory
+
