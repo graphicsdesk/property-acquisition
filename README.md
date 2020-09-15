@@ -8,7 +8,7 @@ Columbia goes by many different official names. To find these names, `parties.py
 
 `documents.py` scrapes the search results from ACRIS. It extracts all the search results into one JSON file of documents.
 
-It then spatial joins each deed to the centroid of the block lot.
+`spatial-join.py` spatial joins each deed to a lot. It writes another shapefile with just those lot-deed shaperecords. The output shapefile is small enough to transform with `mapshaper -points` if centroids are desired.
 
 <!--
 It then merges the JSON with a shapefile of blocks and lots (either [this](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-pluto-mappluto.page) ([documentation](https://github.com/CityOfNewYork/nyc-geo-metadata/blob/master/Metadata/Metadata_DigitalTaxMap.md)) or [this](https://data.cityofnewyork.us/Housing-Development/Department-of-Finance-Digital-Tax-Map/smk3-tmxj)).
