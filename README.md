@@ -8,8 +8,12 @@ Columbia goes by many different official names. To find these names, `parties.py
 
 `documents.py` scrapes the search results from ACRIS. It extracts all the search results into one JSON file of documents.
 
-It then merges the JSON with a shapefile of blocks and lots (either [this](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-pluto-mappluto.page) or [this](https://data.cityofnewyork.us/Housing-Development/Department-of-Finance-Digital-Tax-Map/smk3-tmxj)).
+It then spatial joins each deed to the centroid of the block lot.
+
+<!--
+It then merges the JSON with a shapefile of blocks and lots (either [this](https://www1.nyc.gov/site/planning/data-maps/open-data/dwn-pluto-mappluto.page) ([documentation](https://github.com/CityOfNewYork/nyc-geo-metadata/blob/master/Metadata/Metadata_DigitalTaxMap.md)) or [this](https://data.cityofnewyork.us/Housing-Development/Department-of-Finance-Digital-Tax-Map/smk3-tmxj)).
+-->
 
 ## Data notes
 
-City Register File Numbers (CRFNs) are only available for documents recorded or filed [since January 2, 2003](https://acris.nyoss.com/AcrisHelp/docsearch/default.htm#!Documents/searchbydocumentidci.htm). The Document ID is a unique ACRIS identifier [for all records](https://acris.nyoss.com/AcrisHelp/docsearch/default.htm#!Documents/detailview.htm). 
+City Register File Numbers (CRFNs) are only available for documents recorded or filed [since January 2, 2003](https://acris.nyoss.com/AcrisHelp/docsearch/default.htm#!Documents/searchbydocumentidci.htm). The Document ID is a unique ACRIS identifier [for all records](https://acris.nyoss.com/AcrisHelp/docsearch/default.htm#!Documents/detailview.htm).

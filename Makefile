@@ -4,6 +4,22 @@ PARTY_DIR = party-search
 # TODO: merge with tax lot shapefile.
 # Look at https://github.com/GeospatialPython/pyshp#reading-shapefiles
 
+all: $(DATA_DIR)/deeds.csv test.csv
+
+## TODO: CLEAN THIS SHIT
+test.csv: test.shp
+	mapshaper $^ \
+	-points \
+	-proj wgs84 \
+	-each 'longitude = this.x, latitude = this.y' \
+	-o format=csv $@
+
+
+
+
+$(DATA_DIR)/deeds.csv: $(DATA_DIR)/acris-results.json documents.py
+	./spatial-join.py -spatial-join $<
+
 $(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json documents.py
 	./documents.py -parse-results $< > $@
 
