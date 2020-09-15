@@ -7,16 +7,12 @@ DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 # TODO: merge with tax lot shapefile.
 # Look at https://github.com/GeospatialPython/pyshp#reading-shapefiles
 
-all: $(SHP_DIR)/deeds.shp
-
-## TODO: CLEAN THIS SHIT
-test.csv: test.shp
+deed-centroids.csv: $(SHP_DIR)/deeds.shp
 	mapshaper $^ \
 	-points \
 	-proj wgs84 \
 	-each 'longitude = this.x, latitude = this.y' \
 	-o format=csv $@
-
 
 $(SHP_DIR)/deeds.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH) documents.py Makefile
 	# ./spatial-join.py -spatial-join $< $(word 2,$^) $@
