@@ -15,17 +15,21 @@ def hash_lot(doc):
     return doc['Block'] + '-' + doc['Lot']
 
 
-def spatial_join(): # 50s
+def spatial_join():
+    acris_path = sys.argv[2]
+    dtm_path = sys.argv[3]
+    output_path = sys.argv[4]
+
     documents = defaultdict(list)
 
-    with open(sys.argv[2]) as f:
-        # print(len([x for x in json.load(f)['documents'] if x['DocumentType'] == 'DEED' and x['Doc Date'] != '']))
+    with open(acris_path) as f:
         for doc in json.load(f)['documents']:
             if doc['DocumentType'] == 'DEED' and doc['Doc Date'] != '':
-                documents[doc['Block'] + '-' + doc['Lot']].append(doc['Doc Date'])
+                documents[doc['Block'] + '-' +
+                          doc['Lot']].append(doc['Doc Date'])
 
-    with shapefile.Reader('Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp') as r, \
-            shapefile.Writer('test.shp') as w:
+    with shapefile.Reader(dtm_path) as r, \
+            shapefile.Writer(output_path) as w:
         w.field('block', 'N', size=10)
         w.field('lot', 'N', size=5)
         w.field('date', 'D')
@@ -33,12 +37,12 @@ def spatial_join(): # 50s
         for shaperec in r.iterShapeRecords():
             rec = shaperec.record
             key = f"{rec['BLOCK']}-{rec['LOT']}"
+
             if key in documents:
                 for date in documents[key]:
                     w.record(block=rec['BLOCK'], lot=rec['LOT'], date=datetime.strftime(
                         datetime.strptime(date, '%m/%d/%Y'), '%Y%m%d'))
                     w.shape(shaperec.shape)
-                    print('yeet')
 
 
 def main():

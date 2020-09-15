@@ -1,10 +1,13 @@
 DATA_DIR = data
 PARTY_DIR = party-search
+SHP_DIR = shapefiles
+
+DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 
 # TODO: merge with tax lot shapefile.
 # Look at https://github.com/GeospatialPython/pyshp#reading-shapefiles
 
-all: $(DATA_DIR)/deeds.csv test.csv
+all: $(SHP_DIR)/deeds.shp
 
 ## TODO: CLEAN THIS SHIT
 test.csv: test.shp
@@ -15,12 +18,11 @@ test.csv: test.shp
 	-o format=csv $@
 
 
+$(SHP_DIR)/deeds.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH) documents.py Makefile
+	# ./spatial-join.py -spatial-join $< $(word 2,$^) $@
+	cp $(basename $(word 2,$^)).prj $(basename $@).prj
 
-
-$(DATA_DIR)/deeds.csv: $(DATA_DIR)/acris-results.json documents.py
-	./spatial-join.py -spatial-join $<
-
-$(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json documents.py
+$(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json
 	./documents.py -parse-results $< > $@
 
 $(DATA_DIR)/acris-results-html.json: $(PARTY_DIR)/names.json
