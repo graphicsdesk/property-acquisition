@@ -106,12 +106,8 @@ def parse_results():
     print(json.dumps(output, indent=2))
 
 
-def main():
+if __name__ == '__main__':
     {
         '-scrape-acris': scrape_acris,
         '-parse-results': parse_results,
     }[sys.argv[1]]()
-
-
-if __name__ == '__main__':
-    main()

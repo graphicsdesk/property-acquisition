@@ -7,18 +7,10 @@ import sys
 import json
 
 
-def eprint(*args, **kwargs):
-    print(*args, file=sys.stderr, **kwargs)
-
-
-def hash_lot(doc):
-    return doc['Block'] + '-' + doc['Lot']
-
-
 def spatial_join():
-    acris_path = sys.argv[2]
-    dtm_path = sys.argv[3]
-    output_path = sys.argv[4]
+    acris_path = sys.argv[1]
+    dtm_path = sys.argv[2]
+    output_path = sys.argv[3]
 
     documents = defaultdict(list)
 
@@ -45,11 +37,5 @@ def spatial_join():
                     w.shape(shaperec.shape)
 
 
-def main():
-    {
-        '-spatial-join': spatial_join,
-    }[sys.argv[1]]()
-
-
 if __name__ == '__main__':
-    main()
+    spatial_join()
