@@ -5,7 +5,7 @@ SHP_DIR = shapefiles
 DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 
 deed-centroids.csv: $(SHP_DIR)/deeds.shp
-	mapshaper $^ \
+	mapshaper $< \
 	-points \
 	-proj wgs84 \
 	-each 'longitude = this.x, latitude = this.y' \
@@ -14,6 +14,9 @@ deed-centroids.csv: $(SHP_DIR)/deeds.shp
 $(SHP_DIR)/deeds.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH)
 	./spatial-join.py $< $(word 2,$^) $@
 	cp $(basename $(word 2,$^)).prj $(basename $@).prj
+
+$(DATA_DIR)/document_parties.json: $(DATA_DIR)/acris-results.json documents.py
+	./documents.py -get-parties $< > $@
 
 $(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json
 	./documents.py -parse-results $< > $@

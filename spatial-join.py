@@ -16,7 +16,7 @@ def spatial_join():
 
     with open(acris_path) as f:
         for doc in json.load(f)['documents']:
-            if doc['DocumentType'] == 'DEED' and doc['Doc Date'] != '':
+            if doc['DocumentType'] == 'DEED' and doc['Doc Date'] != '' and doc['Party Type/Other'] == '2':
                 documents[doc['Block'] + '-' +
                           doc['Lot']].append(doc['Doc Date'])
 

@@ -1,14 +1,38 @@
 #!/usr/bin/env python3
 
+from aiohttp import ClientSession
 from bs4 import BeautifulSoup
 from datetime import datetime
+from tqdm import tqdm
+import asyncio
 import requests
 import json
 import sys
 
+USER_AGENT = 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/85.0.4183.83 Safari/537.36'
+
 
 def eprint(*args, **kwargs):
     print(*args, file=sys.stderr, **kwargs)
+
+
+def get_parties():
+
+    with open(sys.argv[2]) as f:
+        documents = json.load(f)['documents']
+
+    async def get_document(doc_id, client):
+        async with client.get('https://a836-acris.nyc.gov/DS/DocumentSearch/DocumentDetail', params=(('doc_id', doc_id),)) as response:
+            soup = BeautifulSoup(await response.read(), 'lxml')
+            return [party_table.td.div.font.text.strip() for party_table in soup.body.find_all('table', recursive=False)[3].td.find_all(
+                'table', recursive=False)[2].find_all('tr', recursive=False)]
+
+    async def get_all_documents():
+        async with ClientSession(headers = {'user-agent': USER_AGENT}) as client:
+            tasks = [(doc['document_id'], get_document(doc['document_id'], client)) for doc in documents]
+            return {doc_id: await f for doc_id, f in tqdm(asyncio.as_completed(tasks), total=len(tasks))}
+
+    return asyncio.run(get_all_documents())
 
 
 def scrape_acris():
@@ -16,9 +40,7 @@ def scrape_acris():
         '__RequestVerificationToken_L0RT': 'Pd9WJCBuNHbm8mveovl484x0TLGVr6zODB2JbY3yu+YB869EJOvp1KEpmBUQpj0euo9a8D3ndTzMDDu3lUweC5ZAaT9VYxHjYfqAGGMDXMsvRmqT2KBUmhOH8MKZL77wu6I84+aw+qXtSNnMTf7n59cYJrHxZTf5RYIoDYVOvZc=',
     }
 
-    headers = {
-        'user-agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_13_6) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/84.0.4147.135 Safari/537.36',
-    }
+    headers = {'user-agent': USER_AGENT}
 
     with open(sys.argv[2]) as f:
         names = json.load(f)
@@ -89,19 +111,25 @@ def parse_results():
         headers = None
 
         for row in soup.form.tbody.table.find_all('tr', recursive=False):
-            values = row.find_all('td', recursive=False)[1:]
+            values = row.find_all('td', recursive=False)
             if headers is None:
                 headers = [v.font.text.strip().replace('  ', '').replace(
                     '/\n', '/').replace('\n', ' ').replace('\r ', '') for v in values]
+                headers[0] = 'document_id'
                 continue
 
-            output['documents'].append(dict(zip(headers, [v.text.strip() for v in values])))
+            # Onclicks are formatted like: JavaScript:go_detail("FT_1330008712333")
+            document = dict(
+                zip(headers[1:], [v.text.strip() for v in values[1:]]))
+            document[headers[0]] = values[0].font.input['onclick'][-18:-2]
+
+            output['documents'].append(document)
 
     eprint(len(output['documents']))
 
     # Store search critera and date in the output as metadata
     # output['meta'] = soup.body.find_all('table', recursive=False)[3].table.font.find_next(
-        # 'font').text.replace(u'\xa0', u' ').replace('  ', '').replace(':\n', ':').replace('\n\n', '\n').strip()
+    # 'font').text.replace(u'\xa0', u' ').replace('  ', '').replace(':\n', ':').replace('\n\n', '\n').strip()
 
     print(json.dumps(output, indent=2))
 
@@ -110,4 +138,5 @@ if __name__ == '__main__':
     {
         '-scrape-acris': scrape_acris,
         '-parse-results': parse_results,
+        '-get-parties': get_parties,
     }[sys.argv[1]]()
