@@ -11,7 +11,7 @@ deed-centroids.csv: $(SHP_DIR)/deeds.shp
 	-each 'longitude = this.x, latitude = this.y' \
 	-o format=csv $@
 
-$(SHP_DIR)/deeds.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH)
+$(SHP_DIR)/acquisitions.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH) spatial-join.py
 	./spatial-join.py $< $(word 2,$^) $@
 	cp $(basename $(word 2,$^)).prj $(basename $@).prj
 
