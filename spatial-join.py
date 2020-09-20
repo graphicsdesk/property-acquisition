@@ -8,6 +8,18 @@ import json
 import sys
 
 
+def eprint(*args, **kwargs):
+    print(*args, file=sys.stderr, **kwargs)
+
+
+def format_date(date):
+    if date == '':
+        return None
+    date = date.split(' ')[0]
+    m, d, y = date.split('/')
+    return y + m.zfill(2) + d.zfill(2)
+
+
 def spatial_join():
     _, acris_path, parties_path, dtm_path, output_path = sys.argv
 
@@ -17,9 +29,8 @@ def spatial_join():
         document_parties = json.load(f)
 
     with open(acris_path) as f:
-        for doc in json.load(f)['documents']:
-            if (doc['DocumentType'] in ['DEED', 'MORTGAGE', 'DEED, OTHER']
-                    and doc['Doc Date'] != ''):
+        for doc in json.load(f):
+            if doc['DocumentType'] in ['DEED', 'MORTGAGE', 'DEED, OTHER']:
                 doc['parties'] = document_parties[doc['document_id']]
                 documents[doc['Block'] + '-' + doc['Lot']].append(doc)
 
@@ -31,7 +42,8 @@ def spatial_join():
         w.field('party1')
         w.field('party2')
         w.field('document_type', 'C')
-        w.field('date', 'D')
+        w.field('doc_date', 'D')
+        w.field('recorded_date', 'D')
 
         for shaperec in tqdm(r.iterShapeRecords(), total=len(r)):
             record = shaperec.record
@@ -45,9 +57,8 @@ def spatial_join():
                              party1=doc['parties'][0],
                              party2=doc['parties'][1],
                              document_type=doc['DocumentType'],
-                             date=datetime.strftime(
-                                 datetime.strptime(doc['Doc Date'],
-                                                   '%m/%d/%Y'), '%Y%m%d'))
+                             doc_date=format_date(doc['Doc Date']),
+                             recorded_date=format_date(doc['Recorded/Filed']))
                     w.shape(shaperec.shape)
 
 

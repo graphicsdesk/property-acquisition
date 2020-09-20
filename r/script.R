@@ -3,16 +3,17 @@ library(tidyverse)
 # Read JSON
 
 library(jsonlite)
-documents <- jsonlite::fromJSON("../data/acris-results.json")$documents
+documents <- jsonlite::fromJSON("../data/acris-results.json")
 
 # Date analysis to check assumptions
 
 documents %>%
-  filter(DocumentType == "DEED") %>% 
   filter(`Doc Date` != "") %>% 
+  filter(DocumentType %in% c('DEED', 'MORTGAGE', 'DEED, OTHER')) %>% 
   mutate(docDate = as.Date(`Doc Date`, "%m/%d/%Y")) %>% 
   ggplot(aes(docDate)) +
-  geom_histogram()
+  geom_histogram() +
+  facet_grid(`Party Type/Other` ~ DocumentType)
 
 documents %>% 
   mutate(hasCRFN = CRFN != "") %>% 
@@ -24,4 +25,4 @@ documents %>%
 # What are the document types?
 
 documents %>% 
-  count(DocumentType) %>% arrange(-n) %>% View()
+  count(DocumentType, `Party Type/Other`) %>% arrange(-n) %>% View()

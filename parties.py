@@ -5,14 +5,12 @@ import json
 
 
 def filter_parties():
-
-    keywords = sys.argv[3:]
     names = set()
 
     with open(sys.argv[2]) as f:
         for line in f:
             name = line.strip()
-            if all(k in name for k in keywords):
+            if 'COLUMBIA UNIV' in name or ('MORNINGSIDE HEIGHTS' in name and 'CORP' in name):
                 names.add(name)
 
     sys.stdout.write(json.dumps(list(names)))
