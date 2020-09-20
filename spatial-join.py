@@ -17,7 +17,7 @@ def format_date(date):
         return None
     date = date.split(' ')[0]
     m, d, y = date.split('/')
-    return y + m.zfill(2) + d.zfill(2)
+    return y + '-' + m.zfill(2) + '-' + d.zfill(2) + 'T00:00:00.000Z'
 
 
 def spatial_join():
@@ -38,12 +38,12 @@ def spatial_join():
             shapefile.Writer(output_path) as w:
         w.field('block', 'N', size=10)
         w.field('lot', 'N', size=5)
-        w.field('party_type', 'C', size=1)
+        w.field('party_type', size=1)
         w.field('party1')
         w.field('party2')
-        w.field('document_type', 'C')
-        w.field('doc_date', 'D')
-        w.field('recorded_date', 'D')
+        w.field('doc_type')
+        w.field('doc_date')
+        w.field('record_date')
 
         for shaperec in tqdm(r.iterShapeRecords(), total=len(r)):
             record = shaperec.record
@@ -56,9 +56,9 @@ def spatial_join():
                              party_type=doc['Party Type/Other'],
                              party1=doc['parties'][0],
                              party2=doc['parties'][1],
-                             document_type=doc['DocumentType'],
+                             doc_type=doc['DocumentType'],
                              doc_date=format_date(doc['Doc Date']),
-                             recorded_date=format_date(doc['Recorded/Filed']))
+                             record_date=format_date(doc['Recorded/Filed']))
                     w.shape(shaperec.shape)
 
 

@@ -12,8 +12,11 @@ DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 
 $(OUTPUT_DIR)/acquisitions.topojson: $(SHP_DIR)/acquisitions.shp Makefile
 	mapshaper $< \
-	-filter 'document_ty !== "MORTGAGE"' \
-	-each 'date = doc_date || recorded_date' \
+	-info \
+	-each "doc_date = doc_date.includes('1899') ? null : doc_date" \
+	-each "record_date = record_date.includes('1899') ? null : record_date" \
+	-each "lazy_date = doc_date || record_date" \
+	-filter 'doc_type !== "MORTGAGE"' \
 	-o $@
 
 all: $(OUTPUT_DIR)/acquisitions.topojson $(OUTPUT_DIR)/acquisitions.geojson
@@ -21,8 +24,10 @@ all: $(OUTPUT_DIR)/acquisitions.topojson $(OUTPUT_DIR)/acquisitions.geojson
 $(OUTPUT_DIR)/acquisitions.geojson: $(SHP_DIR)/acquisitions.shp Makefile
 	mapshaper $< \
 	-proj wgs84 \
-	-filter 'document_ty !== "MORTGAGE"' \
-	-each 'date = doc_date || recorded_date' \
+	-each "doc_date = doc_date.includes('1899') ? null : doc_date" \
+	-each "record_date = record_date.includes('1899') ? null : record_date" \
+	-each "lazy_date = doc_date || record_date" \
+	-filter 'doc_type !== "MORTGAGE"' \
 	-o $@
 
 
@@ -30,7 +35,7 @@ $(OUTPUT_DIR)/acquisitions.geojson: $(SHP_DIR)/acquisitions.shp Makefile
 # SPATIAL JOINING #
 ###################
 
-$(SHP_DIR)/acquisitions.shp: $(DATA_DIR)/acris-results.json $(DATA_DIR)/document_parties.json $(DTM_PATH) spatial-join.py
+$(SHP_DIR)/acquisitions.shp: $(DATA_DIR)/acris-results.json $(DATA_DIR)/document_parties.json $(DTM_PATH)
 	./spatial-join.py $< $(word 2,$^) $(word 3,$^) $@
 	cp $(basename $(word 3,$^)).prj $(basename $@).prj
 
