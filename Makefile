@@ -15,7 +15,7 @@ $(SHP_DIR)/deeds.shp: $(DATA_DIR)/acris-results.json $(DTM_PATH)
 	./spatial-join.py $< $(word 2,$^) $@
 	cp $(basename $(word 2,$^)).prj $(basename $@).prj
 
-$(DATA_DIR)/document_parties.json: $(DATA_DIR)/acris-results.json documents.py
+$(DATA_DIR)/document_parties.json: $(DATA_DIR)/acris-results.json
 	./documents.py -get-parties $< > $@
 
 $(DATA_DIR)/acris-results.json: $(DATA_DIR)/acris-results-html.json
