@@ -19,11 +19,10 @@ def eprint(*args, **kwargs):
 def get_parties():
 
     with open(sys.argv[2]) as f:
-        documents = list(set(
-            doc['document_id'] for doc in json.load(f)['documents']
-            if doc['DocumentType'] == 'DEED' and doc['Doc Date'] != ''
-            and doc['Party Type/Other'] == '2'
-        ))
+        documents = list(
+            set(doc['document_id'] for doc in json.load(f)['documents']
+                if doc['DocumentType'] in ['DEED', 'MORTGAGE', 'DEED, OTHER']
+                and doc['Doc Date'] != ''))
 
     async def get_document(doc_id, client):
         async with client.get(
@@ -45,15 +44,14 @@ def get_parties():
     async def get_all_documents():
         async with ClientSession(headers={'user-agent': USER_AGENT}) as client:
 
-            tasks = [
-                get_document(doc_id, client) for doc_id in documents
-            ]
+            tasks = [get_document(doc_id, client) for doc_id in documents]
             return [
                 await f
                 for f in tqdm(asyncio.as_completed(tasks), total=len(tasks))
             ]
 
-    sys.stdout.write(json.dumps(dict(zip(documents, asyncio.run(get_all_documents())))))
+    sys.stdout.write(
+        json.dumps(dict(zip(documents, asyncio.run(get_all_documents())))))
 
 
 def scrape_acris():
