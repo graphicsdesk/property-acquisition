@@ -10,7 +10,7 @@ DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 # WEB EXPORT #
 ##############
 
-$(OUTPUT_DIR)/acquisitions.topojson: $(SHP_DIR)/acquisitions.shp Makefile
+$(OUTPUT_DIR)/acquisitions.topojson: $(SHP_DIR)/acquisitions.shp
 	mapshaper $< \
 	-each "doc_date = doc_date.includes('1899') ? null : doc_date" \
 	-each "record_date = record_date.includes('1899') ? null : record_date" \
@@ -20,7 +20,7 @@ $(OUTPUT_DIR)/acquisitions.topojson: $(SHP_DIR)/acquisitions.shp Makefile
 
 all: $(OUTPUT_DIR)/acquisitions.topojson $(OUTPUT_DIR)/acquisitions.geojson
 
-$(OUTPUT_DIR)/acquisitions.geojson: $(SHP_DIR)/acquisitions.shp Makefile
+$(OUTPUT_DIR)/acquisitions.geojson: $(SHP_DIR)/acquisitions.shp
 	mapshaper $< \
 	-proj wgs84 \
 	-each "doc_date = doc_date.includes('1899') ? null : doc_date" \

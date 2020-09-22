@@ -56,7 +56,6 @@ def get_parties():
 
 
 def scrape_acris():
-    '''UNTESTED SINCE I MADE PARALLEL'''
 
     cookies = {
         '__RequestVerificationToken_L0RT':
@@ -100,19 +99,19 @@ def scrape_acris():
                 'https://a836-acris.nyc.gov/DS/DocumentSearch/PartyNameResult',
                 data=data) as response:
             time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
-            return {'time': time, 'name': name, 'html': await response.read()}
+            eprint(len(await response.text()))
+            return {'time': time, 'name': name, 'html': await response.text()}
 
     async def search_all_names():
         async with ClientSession(headers={'user-agent': USER_AGENT},
                                  cookies=cookies) as client:
-            tasks = [search_name(name, client) for name in names]
+            tasks = [search_name(name, client) for name in names][:2]
             return [
                 await f
                 for f in tqdm(asyncio.as_completed(tasks), total=len(tasks))
             ]
 
-    sys.stdout.write(
-        json.dumps(dict(zip(names, asyncio.run(search_all_names())))))
+    sys.stdout.write(json.dumps(asyncio.run(search_all_names())))
 
 
 def parse_search_page(doc):
