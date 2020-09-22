@@ -10,8 +10,13 @@ def filter_parties():
     with open(sys.argv[2]) as f:
         for line in f:
             name = line.strip()
-            if 'COLUMBIA UNIV' in name or ('MORNINGSIDE HEIGHTS' in name and 'CORP' in name):
+            if 'COLUMBIA UN' in name or ('MORNINGSIDE HEIGHTS' in name
+                                         and 'CORP' in name):
                 names.add(name)
+            else:
+                index1 = name.find('TRUSTEE')
+                if index1 >= 0 and name.find('COLUMBIA') > index1 and 'KATS' not in name:
+                    names.add(name)
 
     sys.stdout.write(json.dumps(list(names)))
 
