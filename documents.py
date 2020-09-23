@@ -55,7 +55,66 @@ def get_parties():
         json.dumps(dict(zip(documents, asyncio.run(get_all_documents())))))
 
 
+from concurrent.futures import ThreadPoolExecutor
+
+
 def scrape_acris():
+
+    with open('./party-search/names.json') as f:
+        names = json.load(f)
+
+    def search_name(session, name):
+        cookies = {
+            '__RequestVerificationToken_L0RT':
+            'Pd9WJCBuNHbm8mveovl484x0TLGVr6zODB2JbY3yu+YB869EJOvp1KEpmBUQpj0euo9a8D3ndTzMDDu3lUweC5ZAaT9VYxHjYfqAGGMDXMsvRmqT2KBUmhOH8MKZL77wu6I84+aw+qXtSNnMTf7n59cYJrHxZTf5RYIoDYVOvZc=',
+        }
+        headers = {'user-agent': USER_AGENT}
+        data = {
+            '__RequestVerificationToken':
+            'Ur6XUdRsPQXwOFJshdldobB6iY8ZTdcCj+oWldpt/jHPCxsN7WfRQFqcf0sdYP9Eb4wBYMi5oDWHYPShKU0w1FiyZHPjfW9WbFFPamJFDTc+nsPT/oR9Z320sre66M3L/3EIvd4YxucWOvm+b71KIBPFiJx2DYZEQYC04+H1bh4=',
+            'hid_last': '',
+            'hid_first': '',
+            'hid_ml': '',
+            'hid_suffix': '',
+            'hid_business': name,
+            'hid_selectdate': 'To Current Date',
+            'hid_datefromm': '',
+            'hid_datefromd': '',
+            'hid_datefromy': '',
+            'hid_datetom': '',
+            'hid_datetod': '',
+            'hid_datetoy': '',
+            'hid_partype': '',
+            'hid_borough': '0',
+            'hid_doctype': 'All Document Classes',
+            'hid_max_rows': '9999',
+            'hid_page': '2',
+            'hid_partype_name': 'All Parties',
+            'hid_doctype_name': 'All Document Classes',
+            'hid_borough_name': 'All Boroughs/Counties',
+            'hid_ReqID': '',
+            'hid_SearchType': 'PARTYNAME',
+            'hid_ISIntranet': 'N',
+            'hid_sort': ''
+        }
+
+        with session.post(
+                'https://a836-acris.nyc.gov/DS/DocumentSearch/PartyNameResult',
+                data=data,
+                headers=headers,
+                cookies=cookies) as response:
+            time = datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+            return {'time': time, 'name': name, 'html': response.text}
+
+    output = []
+    with requests.Session() as session:
+        for name in tqdm(names):
+            output.append(search_name(session, name))
+
+    sys.stdout.write(json.dumps(output))
+
+
+def scrape_acris_old():
 
     cookies = {
         '__RequestVerificationToken_L0RT':

@@ -1,4 +1,9 @@
+# Set number of parallel jobs to number of available processors
+NPROCS = $(shell sysctl hw.ncpu | grep -o '[0-9]\+')
+MAKEFLAGS += -j$(NPROCS)
+
 DATA_DIR = data
+HTML_DIR = $(DATA_DIR)/html
 PARTY_DIR = party-search
 SHP_DIR = shapefiles
 OUTPUT_DIR = outputs
