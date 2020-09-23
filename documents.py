@@ -40,7 +40,7 @@ def get_parties():
                 if name != '':
                     party_names.append(name)
 
-            return party_names
+            return (doc_id, party_names)
 
     async def get_all_documents():
         async with ClientSession(headers={'user-agent': USER_AGENT}) as client:
@@ -51,11 +51,7 @@ def get_parties():
                 for f in tqdm(asyncio.as_completed(tasks), total=len(tasks))
             ]
 
-    sys.stdout.write(
-        json.dumps(dict(zip(documents, asyncio.run(get_all_documents())))))
-
-
-from concurrent.futures import ThreadPoolExecutor
+    sys.stdout.write(json.dumps(dict(asyncio.run(get_all_documents()))))
 
 
 def scrape_acris():
