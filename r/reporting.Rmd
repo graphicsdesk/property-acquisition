@@ -1,0 +1,20 @@
+---
+title: "reporting"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(tidyverse)
+library(jsonlite)
+documents <- jsonlite::fromJSON("../data/acris-results.json")
+```
+
+Look for Morningside Gardens documents to see if it's a highlightable area on the scrolly viz
+
+```{r}
+documents %>% 
+  filter(Block == "1978" & Lot == "1") %>% 
+  mutate(docDate = as.Date(`Doc Date`, "%m/%d/%Y")) %>% 
+  View()
+```
+

@@ -18,6 +18,7 @@ DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 $(OUTPUT_DIR)/acquisitions.json: $(SHP_DIR)/acquisitions.shp
 	mapshaper $< \
 	-proj wgs84 \
+	-filter "party_type == '2'" \
 	-each "doc_date = doc_date.includes('1899') ? null : doc_date" \
 	-each "record_date = record_date.includes('1899') ? null : record_date" \
 	-each "lazy_date = doc_date || record_date" \
