@@ -28,11 +28,25 @@ def spatial_join():
     with open(parties_path) as f:
         document_parties = json.load(f)
 
+    def doc_is_unique(doc_key, doc):
+        '''Returns true if the document has likely not already been seen.'''
+
+        relevant_keys = [
+            'Party Type/Other', 'Reel/Pg/File', 'Doc Date', 'Recorded/Filed',
+            'DocumentType', 'Pages', 'Doc Amount', 'parties'
+        ]
+
+        return not any(
+            all(d[k] == doc[k] for k in relevant_keys)
+            for d in documents[doc_key])
+
     with open(acris_path) as f:
         for doc in json.load(f):
             if doc['DocumentType'] in ['DEED', 'MORTGAGE', 'DEED, OTHER']:
+                doc_key = doc['Block'] + '-' + doc['Lot']
                 doc['parties'] = document_parties[doc['document_id']]
-                documents[doc['Block'] + '-' + doc['Lot']].append(doc)
+                if doc_is_unique(doc_key, doc):
+                    documents[doc_key].append(doc)
 
     with shapefile.Reader(dtm_path) as r, \
             shapefile.Writer(output_path) as w:
