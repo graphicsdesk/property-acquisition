@@ -6,7 +6,7 @@ DATA_DIR = data
 HTML_DIR = $(DATA_DIR)/html
 PARTY_DIR = party-search
 SHP_DIR = shapefiles
-OUTPUT_DIR = outputs
+OUTPUT_DIR = ../policing-history/data
 
 DTM_PATH = $(SHP_DIR)/Digital_Tax_Map_20200828/DTM_Tax_Lot_Polygon.shp
 
