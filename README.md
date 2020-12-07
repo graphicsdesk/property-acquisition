@@ -1,4 +1,4 @@
-Looking at Columbia's acquisitions in NYC's property records.
+Looking at Columbia's acquisitions in NYC's property records. Visual production at https://github.com/graphicsdesk/policing-history.
 
 ## Reproduction
 
